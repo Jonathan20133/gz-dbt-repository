@@ -1,32 +1,74 @@
-
 version: 2
 sources:
   - name: raw
     schema: gz_raw_data
-    description: raw_data_greenweez
+    description: "Raw data for Greenweez"
     tables:
       - name: sales
         identifier: raw_gz_sales
+        freshness: 
+          warn_after:
+            count: 90
+            period: day
+        loaded_at_field: "CAST(date_date as TIMESTAMP)" 
+        
+        description: "This table contains sales data, including the date of sale, order ID, product ID, revenue, and quantity sold."
+        columns:
+          - name: orders_id
+            description: "Primary Key of the table."
+          - name: date_date
+            description: "The date of the sale."
+          - name: products_id
+            description: "The unique identifier for each product."
+          - name: revenue
+            description: "Revenue per order."
+          - name: quantity
+            description: "Amount of products sold."
+        tests: 
+          - unique:
+              column_name: "(orders_id || '-' || pdt_id)"
+            
       - name: product
-        identifier: raw_gz_product  
+        identifier: raw_gz_product
+        description: "This table contains product data, including product IDs and purchase prices."
+        columns:
+          - name: products_id
+            description: "Primary Key of the table."
+            tests:
+              - unique
+              - not_null
+          - name: date_date
+            description: "The date of the sale."
+          - name: purchase_price
+            description: "The price of each product."
+
       - name: ship
         identifier: raw_gz_ship
-
+        description: "This table contains shipping data, including order IDs, shipping fees, logistic costs, and ship costs."
+        columns:
+          - name: orders_id
+            description: "The unique identifier of the sales table"
+          - name: shipping_fee
+            description: "The cost of shipping per order."
+          - name: log_cost
+            description: "The logistics cost per order."
+          - name: ship_cost
+            description: "The transportation cost per order"
 models:
-    - name: my_first_dbt_model
-      description: "A starter dbt model"
-      columns:
-          - name: id
-            description: "The primary key for this table"
-            tests:
-                - unique
-                - not_null
+  - name: my_first_dbt_model
+    description: "A starter dbt model"
+    columns:
+      - name: id
+        description: "The primary key for this table"
+        tests:
+          - unique
+          - not_null
 
-    - name: my_second_dbt_model
-      description: "A starter dbt model"
-      columns:
-          - name: id
-            description: "The primary key for this table"
-            tests:
-                - unique
-                - not_null
+  - name: my_second_dbt_model
+    description: "A starter dbt model"
+    columns:
+      - name: id
+        description: "The primary key for this table"
+        tests:
+          - unique
+          - not_null
